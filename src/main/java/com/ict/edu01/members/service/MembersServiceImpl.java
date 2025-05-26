@@ -14,5 +14,12 @@ public class MembersServiceImpl implements MembersService {
     public MembersVO getLogin(MembersVO mvo) {
         return membersMapper.getLogin(mvo);
     }
+
+    @Override
+    public int getRegister(MembersVO mvo) {
+        return membersMapper.getRegister(mvo);
+    }
+
+    
     
 }
