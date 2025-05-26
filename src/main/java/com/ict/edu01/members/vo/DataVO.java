@@ -13,5 +13,4 @@ public class DataVO {
     private String message;
     private Object data ;
 
-    
 }
