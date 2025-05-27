@@ -7,5 +7,9 @@
     <select id="guestbooklist" resultType="GuestBookVO" >
         select * from guestbook 
     </select>
+
+    <select id="guestbookdetail" parameterType="String" resultType="GuestBookVO">
+        select * from guestbook where gb_idx = #{gb_idx}
+    </select>
    
 </mapper>
