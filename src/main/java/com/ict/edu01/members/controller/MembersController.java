@@ -2,15 +2,18 @@ package com.ict.edu01.members.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ict.edu01.jwt.JwtService;
 import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 @RestController
 @RequestMapping("/api/members")
@@ -18,7 +21,10 @@ public class MembersController {
 
     @Autowired
     private MembersService membersService;
-    
+
+    @Autowired
+    private JwtService jwtService;
+
     @GetMapping("/hello")
     public String getHello() {
         return "Hello, SpringBoot";
@@ -31,9 +37,6 @@ public class MembersController {
 
         try{
 
-        // DB 에 가서 m_id 와 m_pw가 맞는지 확인한다.
-        MembersVO membersVO = membersService.getLogin(mvo);
-        
         // DataVO dataVO = new DataVO();
         // 만약에 맞면 
         // dataVO.setSuccess(true);
@@ -51,16 +54,27 @@ public class MembersController {
         // 맞지 않으면 
         // dataVO.setSuccess(false);
         // dataVO.setMessage("로그인 실패");
-
+        
+        // DB 에 가서 m_id 와 m_pw가 맞는지 확인한다.
+        /* jwt 사용하지 않은 로그인
+        MembersVO membersVO = membersService.getLogin(mvo);
         if(membersVO == null){
             dataVO.setSuccess(false);
             dataVO.setMessage("로그인 실패");
         }else{
+            // 로그인 성공했을 때 token 처리
+            
             dataVO.setSuccess(true);
             dataVO.setMessage("로그인 성공");
             dataVO.setData(membersVO);
         }
-
+        */
+         
+            // jwt를 활용한 로그인 처리 
+            Map<String, String> tokens = jwtService.login(mvo);
+            dataVO.setSuccess(true);
+            dataVO.setData(tokens);
+            dataVO.setMessage("로그인 성공");
         }catch(Exception e){
             dataVO.setSuccess(false);
             dataVO.setMessage("서버 오류 : " + e.getMessage());

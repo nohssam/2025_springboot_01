@@ -1,5 +1,6 @@
 package com.ict.edu01.jwt;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,19 @@ public class JwtServiceImpl implements JwtService{
             throw new IllegalArgumentException("Invalid Token");
        }
 
+       // springSecurity
 
-       return null;
+       // Refresh Token 처리
+
+       // Access Token 생성
+       String accessToken = jwtUtil.generateAccessToken(user.getM_id());
+       
+       // 결과 저장
+       Map<String, String> tokens = new HashMap<>();
+       tokens.put("accessToken", accessToken);
+       // 원래는 refreshToken 도 저장
+
+       return tokens;
     }
 
     @Override
