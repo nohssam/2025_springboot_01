@@ -2,7 +2,6 @@ package com.ict.edu01.jwt;
 
 import java.security.Key;
 import java.util.Date;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -63,6 +62,24 @@ public class JwtUtil {
         } catch (JwtException | IllegalArgumentException e) {
            throw new IllegalArgumentException("Invalid Token");
         }
+    }
+
+    // 토큰 만료 되었는지 확인하는 메서드 
+    public boolean isTokenExpired(String token){
+        return extractExpiration(token).before(new Date());
+    }
+    // 만료 날짜 추출
+    public Date extractExpiration(String token){
+        return extractAllClaims(token).getExpiration();
+    }
+
+    // 받은토근을 이용해서 모든 정보 반환
+    public Claims extractAllClaims(String token){
+        return Jwts.parserBuilder()
+        .setSigningKey(secretKey)
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
     }
 
 }
