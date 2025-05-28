@@ -66,7 +66,6 @@ public class MembersController {
             dataVO.setMessage("서버 오류 : " + e.getMessage());
         }
 
-
         return dataVO;
     }
     
@@ -83,6 +82,27 @@ public class MembersController {
                 dataVO.setMessage("회원가입 실패");
             }
 
+        } catch (Exception e) {
+            dataVO.setSuccess(false);
+            dataVO.setMessage("서버 오류 : " + e.getMessage());
+        }
+        return dataVO;
+    }
+    
+    @PostMapping("/mypage")
+    public DataVO getMyPage(@RequestBody MembersVO mvo2) {
+        System.out.println("m_idx : " + mvo2);
+        DataVO dataVO = new DataVO();
+        try {
+            MembersVO mvo = membersService.getMyPage(mvo2.getM_idx());
+            if(mvo == null){
+                dataVO.setSuccess(false);
+                dataVO.setMessage("잘못된 정보 입니다.");
+            }else{
+                dataVO.setSuccess(true);
+                dataVO.setMessage("가져오기 성공");
+                dataVO.setData(mvo);
+            }
         } catch (Exception e) {
             dataVO.setSuccess(false);
             dataVO.setMessage("서버 오류 : " + e.getMessage());
