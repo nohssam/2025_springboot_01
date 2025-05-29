@@ -38,21 +38,20 @@ public class JwtRequestFilter extends OncePerRequestFilter{
         // 들어오는 요청마다 Authorization 있고 Authorization를 jwt 검증하기 위해서 추출
         final String authorizationHeader = request.getHeader("Authorization");
         String userId = null;
-        String jwtToken1 = null;
-        String jwtToken2 = null;
+        String jwtToken = null;
+        
         // authorizationHeader 에 "Bearer " 있어야 다음 단계를 할수 있다.
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            jwtToken1 = authorizationHeader.substring(7);
-            jwtToken2 = authorizationHeader.toString();
+            jwtToken = authorizationHeader.toString();
             try {
-                log.info("jwtToken : " + jwtToken1);
+               // log.info("jwtToken : " + jwtToken1);
                 // 토큰 만료 검사 
-                if(jwtUtil.isTokenExpired(jwtToken1)){
+                if(jwtUtil.isTokenExpired(jwtToken.substring(7))){
                     log.info("token expire error");
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
                     return ;
                 }
-                userId =  jwtUtil.validateAndExtractUserId(jwtToken2);
+                userId =  jwtUtil.validateAndExtractUserId(jwtToken);
 
             } catch (Exception e) {
                log.info("token error");
@@ -70,7 +69,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
             
             // JWT 검증 및 SpringSecurity 인증객체에 사용자 정보를 등록
-            if(jwtUtil.validateToken(jwtToken2, userDetails)){
+            if(jwtUtil.validateToken(jwtToken, userDetails)){
                 // SpringSecurity 표준 인증 객체 (인증주체, 자격증명(null=jwt), 권한정보(ROLE))
                 UsernamePasswordAuthenticationToken authToken =
                   new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
