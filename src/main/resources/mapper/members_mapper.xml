@@ -14,4 +14,7 @@
     <select id="getMyPage" parameterType="String" resultType="MembersVO">
         select * from members where m_idx = #{m_idx}
     </select>
+    <select id="findUserById" parameterType="String" resultType="MembersVO">
+          select * from members where m_id = #{m_id}
+    </select>
 </mapper>
