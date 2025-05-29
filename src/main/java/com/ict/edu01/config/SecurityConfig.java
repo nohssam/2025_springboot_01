@@ -37,7 +37,7 @@ public class SecurityConfig {
     // 생성자
     public SecurityConfig(JwtRequestFilter jwtRequestFilter, JwtUtil jwtUtil,
         MyUserDetailService userDetailService, MembersService membersService){
-        log.info("SecurityConfig 생성자");
+        log.info("SecurityConfig const");
          
         this.jwtRequestFilter = jwtRequestFilter;
         this.userDetailService = userDetailService;
@@ -47,7 +47,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("securityFilterChain 호출");
+        log.info("securityFilterChain call");
         http
             // CORS 설정 ( a -> b 의미는  a 를 받아서 b를 실행하라 (람다식 표현))
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))

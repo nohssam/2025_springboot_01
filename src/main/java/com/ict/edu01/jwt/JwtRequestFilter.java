@@ -3,7 +3,9 @@ package com.ict.edu01.jwt;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter{
 
-    private final AuthenticationManager authenticationManager;
    @Autowired
    private JwtUtil jwtUtil;
    
@@ -29,34 +30,62 @@ public class JwtRequestFilter extends OncePerRequestFilter{
    private UserDetailsService userDetailsService;
 
 
-    JwtRequestFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.info("JwtRequestFilter 호출");
+
+        log.info("JwtRequestFilter call");
                 
         // 들어오는 요청마다 Authorization 있고 Authorization를 jwt 검증하기 위해서 추출
         final String authorizationHeader = request.getHeader("Authorization");
         String userId = null;
-        String jwtToken = null;
-
+        String jwtToken1 = null;
+        String jwtToken2 = null;
         // authorizationHeader 에 "Bearer " 있어야 다음 단계를 할수 있다.
-        if(authenticationManager != null && authorizationHeader.startsWith("Bearer ")){
-            jwtToken = authorizationHeader.substring(7);
+        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+            jwtToken1 = authorizationHeader.substring(7);
+            jwtToken2 = authorizationHeader.toString();
             try {
+                log.info("jwtToken : " + jwtToken1);
                 // 토큰 만료 검사 
-                
+                if(jwtUtil.isTokenExpired(jwtToken1)){
+                    log.info("token expire error");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
+                    return ;
+                }
+                userId =  jwtUtil.validateAndExtractUserId(jwtToken2);
+
             } catch (Exception e) {
-               log.info("토큰 처리 중 오류 발생");
-               response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토근 처리 오류");
+               log.info("token error");
+               response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "token error");
             }
 
         }else{
-            log.info("Authorization 비었거나 Bearer 토큰이 없네요 ");
+            log.info("Authorization empty Bearer token empty");
         }
+
+        // 사용자ID가 존재하고 SecurityContext에 인증정보가 없는 경우 등록하기 위해서서
+        if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            // 등록하자 
+            // DB 에서 사용자 정보 가져오기 
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+            
+            // JWT 검증 및 SpringSecurity 인증객체에 사용자 정보를 등록
+            if(jwtUtil.validateToken(jwtToken2, userDetails)){
+                // SpringSecurity 표준 인증 객체 (인증주체, 자격증명(null=jwt), 권한정보(ROLE))
+                UsernamePasswordAuthenticationToken authToken =
+                  new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                // SecurityContext에 등록
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                log.info("JWT token ok");
+            }else{
+               log.info("JWT token error"); 
+            }
+            
+        }
+
+        // 필터 체인 실행 (다른 필터로 요청 전달)
+        filterChain.doFilter(request, response);
+
     }
     
 }
