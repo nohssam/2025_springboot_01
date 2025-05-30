@@ -10,6 +10,8 @@ import com.ict.edu01.members.service.MyUserDetailService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,12 +136,13 @@ public class MembersController {
         return dataVO;
     }
     
-    @PostMapping("/mypage")
-    public DataVO getMyPage(@RequestBody MembersVO mvo2) {
-        System.out.println("m_idx : " + mvo2);
+    @GetMapping("/mypage")
+    public DataVO getMyPage(HttpServletRequest request) {
         DataVO dataVO = new DataVO();
         try {
-            MembersVO mvo = membersService.getMyPage(mvo2.getM_idx());
+            String token = request.getHeader("Authorization").replace("Bearer ", "");
+            String m_id = jwtUtil.validateAndExtractUserId(token);
+            MembersVO mvo = membersService.getMyPage(m_id);
             if(mvo == null){
                 dataVO.setSuccess(false);
                 dataVO.setMessage("잘못된 정보 입니다.");

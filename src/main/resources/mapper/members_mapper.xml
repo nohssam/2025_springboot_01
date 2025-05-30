@@ -11,12 +11,15 @@
         insert into members(m_id, m_pw, m_name, m_addr, m_addr2, m_email, m_phone )
         values(#{m_id}, #{m_pw}, #{m_name}, #{m_addr}, #{m_addr2}, #{m_email}, #{m_phone})
     </insert>
+    
     <select id="getMyPage" parameterType="String" resultType="MembersVO">
-        select * from members where m_idx = #{m_idx}
+        select * from members where m_id = #{m_id}
     </select>
+
     <select id="findUserById" parameterType="String" resultType="MembersVO">
           select * from members where m_id = #{m_id}
     </select>
+    
     <!--  ON DUPLICATE KEY UPDATE => 키(Primary key, Unique)가 중복이면 업데이트하시오오
        없으면 insert , 있으면  update   -->
     <insert id="saveRefreshToken" parameterType="RefreshVO">

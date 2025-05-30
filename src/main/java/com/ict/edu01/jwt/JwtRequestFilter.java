@@ -42,16 +42,16 @@ public class JwtRequestFilter extends OncePerRequestFilter{
         
         // authorizationHeader 에 "Bearer " 있어야 다음 단계를 할수 있다.
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            jwtToken = authorizationHeader.toString();
+            jwtToken = authorizationHeader.substring(7);
             try {
-               // log.info("jwtToken : " + jwtToken1);
                 // 토큰 만료 검사 
-                if(jwtUtil.isTokenExpired(jwtToken.substring(7))){
+                if(jwtUtil.isTokenExpired(jwtToken)){
                     log.info("token expire error");
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
                     return ;
                 }
                 userId =  jwtUtil.validateAndExtractUserId(jwtToken);
+                log.info("userId : " + userId);
 
             } catch (Exception e) {
                log.info("token error");
@@ -64,6 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 
         // 사용자ID가 존재하고 SecurityContext에 인증정보가 없는 경우 등록하기 위해서서
         if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            log.info("jwtToken-2 : " + jwtToken.substring(7));
             // 등록하자 
             // DB 에서 사용자 정보 가져오기 
             UserDetails userDetails = userDetailsService.loadUserByUsername(userId);

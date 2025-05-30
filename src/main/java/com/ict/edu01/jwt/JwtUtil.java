@@ -56,7 +56,7 @@ public class JwtUtil {
             // Bearer 는 HTTP Authorization 헤더를 통해 토큰 전달 방식
             // Bearer 의미는  "이 토큰 소지한 자는 인증된 것으로 간주한다." 의미
             // Authorization: Bearer token
-            token = token.substring(7); // token 값만 가져오기 
+            // token = token.substring(7); // token 값만 가져오기 
             Claims claims = Jwts.parserBuilder()  
                         .setSigningKey(secretKey)
                         .build()

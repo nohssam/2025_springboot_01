@@ -24,8 +24,8 @@ public class MembersServiceImpl implements MembersService {
     }
 
     @Override
-    public MembersVO getMyPage(String m_idx) {
-       return membersMapper.getMyPage(m_idx);
+    public MembersVO getMyPage(String m_id) {
+       return membersMapper.getMyPage(m_id);
     }
 
     @Override
