@@ -9,6 +9,7 @@ import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.service.MyUserDetailService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
+import com.ict.edu01.members.vo.RefreshVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -157,5 +158,26 @@ public class MembersController {
         }
         return dataVO;
     }
-    
+
+    @PostMapping("/refresh")
+    public DataVO refresh(@RequestBody Map<String, String> map) {
+        try {
+            System.out.println("refresh 들어오기 성공"); 
+            String refreshToken = map.get("refreshToken");
+            String userId = jwtUtil.validateAndExtractUserId(refreshToken);
+
+            // ✅ DB에서 refreshToken 정보 가져오기 (별도 테이블)
+            RefreshVO refreshVO = membersService.getRefreshToken(userId);
+
+            if (refreshVO == null || !refreshToken.equals(refreshVO.getRefresh_token())) {
+                return new DataVO(false, "refresh token 불일치", null);
+            }
+
+            String newAccessToken = jwtUtil.generateAccessToken(userId);
+            return new DataVO(true, "access token 재발급 성공", Map.of("accessToken", newAccessToken));
+        } catch (Exception e) {
+            return new DataVO(false, "재발급 실패", null);
+        }
+    }
+        
 }

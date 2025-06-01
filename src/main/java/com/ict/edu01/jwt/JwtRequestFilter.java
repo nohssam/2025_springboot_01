@@ -34,6 +34,13 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             throws ServletException, IOException {
 
         log.info("JwtRequestFilter call");
+
+        // ✅ 토큰 검사 예외 처리: refresh 요청은 필터 통과
+        String path = request.getRequestURI();
+        if ("/api/members/refresh".equals(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
                 
         // 들어오는 요청마다 Authorization 있고 Authorization를 jwt 검증하기 위해서 추출
         final String authorizationHeader = request.getHeader("Authorization");
@@ -47,19 +54,24 @@ public class JwtRequestFilter extends OncePerRequestFilter{
                 // 토큰 만료 검사 
                 if(jwtUtil.isTokenExpired(jwtToken)){
                     log.info("token expire error");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
-                    return ;
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"success\":false,\"message\":\"token expired\"}");
+                    return;
                 }
                 userId =  jwtUtil.validateAndExtractUserId(jwtToken);
                 log.info("userId : " + userId);
 
             } catch (Exception e) {
-               log.info("token error");
-               response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "token error");
+                log.info("token error: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"success\":false,\"message\":\"token error\"}");
+                return;
             }
 
         }else{
-            log.info("Authorization empty Bearer token empty");
+            log.info("Authorization header is empty or doesn't start with Bearer");
         }
 
         // 사용자ID가 존재하고 SecurityContext에 인증정보가 없는 경우 등록하기 위해서서
