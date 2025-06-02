@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -64,6 +67,13 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
 
             // oauth2Login 설정
+            // build.gradle 에서 import xxxxxxxxxxxxx-oauth2-client
+            // successHandler() : 로그인 성공시 호출
+            // userInfoEndpoint => 인증과정에서 인증된 사용자에 대한 정보를 제공하는 API 엔드포인트
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oAuth2AuthenticationSuccessHandler())
+                .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService()))
+            )
 
             // 사용자 요청이 오면 먼저 jwtRequestFilter가 실행되어, JWT토큰을 검증 할 후
             // 이상이 없으면 SpringSecurity의 인증된 사용자로 처리된다.
@@ -73,6 +83,17 @@ public class SecurityConfig {
         return http.build();
     }
     
+    @Bean
+    // 동의항목처리
+    OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(){
+        return new OAuth2AuthenticationSuccessHandler(jwtUtil, userDetailService, membersService);
+    }
+
+    @Bean
+    // 사용자 정보 정보
+    OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(){
+        return new CustomerOAuth2UserService();
+    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(){

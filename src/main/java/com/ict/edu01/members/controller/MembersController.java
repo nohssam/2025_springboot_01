@@ -165,13 +165,23 @@ public class MembersController {
         try {
             log.info("refresh 들어왔네요");
             String refreshToken = map.get("refreshToken");
+            
+            // 1. 만료 여부 검사
+            if(jwtUtil.isTokenExpired(refreshToken)){
+                return new DataVO(false, "refreshToken 만료", null);
+            }
+
+            // 2. 사용자 ID 추출
             String m_id = jwtUtil.validateAndExtractUserId(refreshToken);
+
             // DB에 m_id 가지고 refresh token 을 확인(체크)
             RefreshVO refreshVO = membersService.getRefreshToken(m_id);
+            
             // DB의 refreshToken과 유저가 보낸  refreshToken이 같아야 accessToken 발급
             if(refreshVO == null || ! refreshToken.equals((refreshVO.getRefresh_token()))) {
                  return new DataVO(false,"refreshToken 불일치", null);
             }
+            
             // 새로운 accessToken, refreshToken 발급
              String newAccessToken = jwtUtil.generateAccessToken(m_id);
              String newRefreshToken = jwtUtil.generateRefreshToken(m_id);
