@@ -33,6 +33,11 @@ public class MembersServiceImpl implements MembersService {
         membersMapper.saveRefreshToken(new RefreshVO (m_id, refreshToken, expiry_date));
     }
 
+    @Override
+    public RefreshVO getRefreshToken(String m_id) {
+        return membersMapper.getRefreshToken(m_id);
+    }
+
     
     
 }

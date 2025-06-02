@@ -60,6 +60,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/members/login").permitAll()     // 허용하는 url만 작성
                 .requestMatchers("/api/members/register").permitAll()   // 허용하는 url만 작성
+                .requestMatchers("/api/members/refresh").permitAll()   // 허용하는 url만 작성
                 .anyRequest().authenticated())
 
             // oauth2Login 설정

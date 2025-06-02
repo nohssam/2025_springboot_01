@@ -20,7 +20,7 @@
           select * from members where m_id = #{m_id}
     </select>
     
-    <!--  ON DUPLICATE KEY UPDATE => 키(Primary key, Unique)가 중복이면 업데이트하시오오
+    <!--  ON DUPLICATE KEY UPDATE => 키(Primary key, Unique)가 중복이면 업데이트하시오
        없으면 insert , 있으면  update   -->
     <insert id="saveRefreshToken" parameterType="RefreshVO">
         insert into refresh_token(m_id,refresh_token, expiry_date) 
@@ -29,4 +29,7 @@
         refresh_token = #{refresh_token},
         expiry_date = #{expiry_date}
     </insert>
+    <select id="getRefreshToken" parameterType="String" resultType="RefreshVO">
+        select * from refresh_token where m_id = #{m_id}
+    </select>
 </mapper>

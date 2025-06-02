@@ -9,8 +9,10 @@ import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.service.MyUserDetailService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
+import com.ict.edu01.members.vo.RefreshVO;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/members")
 public class MembersController {
@@ -157,5 +160,38 @@ public class MembersController {
         }
         return dataVO;
     }
+    @PostMapping("/refresh")
+    public DataVO getRefresh(@RequestBody Map<String, String> map) {
+        try {
+            log.info("refresh 들어왔네요");
+            String refreshToken = map.get("refreshToken");
+            String m_id = jwtUtil.validateAndExtractUserId(refreshToken);
+            // DB에 m_id 가지고 refresh token 을 확인(체크)
+            RefreshVO refreshVO = membersService.getRefreshToken(m_id);
+            // DB의 refreshToken과 유저가 보낸  refreshToken이 같아야 accessToken 발급
+            if(refreshVO == null || ! refreshToken.equals((refreshVO.getRefresh_token()))) {
+                 return new DataVO(false,"refreshToken 불일치치", null);
+            }
+            // 새로운 accessToken, refreshToken 발급
+             String newAccessToken = jwtUtil.generateAccessToken(m_id);
+             String newRefreshToken = jwtUtil.generateRefreshToken(m_id);
+
+             // newRefreshToken을 DB에 갱신하자
+             membersService.saveRefreshToken(m_id, newRefreshToken, jwtUtil.extractExpiration(newRefreshToken));
+
+            //  Map<String,String> map2 = new HashMap();
+            //  map2.put("accessToken", newAccessToken);
+            //  map2.put("refreshToken", newRefreshToken);
+            //  return new DataVO(true, "재발급 성공" , map2);
+
+             return new DataVO(true, "재발급 성공" , Map.of(
+                "accessToken",newAccessToken,
+                "refreshToken",newRefreshToken
+             ));
+        } catch (Exception e) {
+            return new DataVO(false,"재발급 실패", null);
+        }
+    }
+    
     
 }
