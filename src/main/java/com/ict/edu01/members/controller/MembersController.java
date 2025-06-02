@@ -170,7 +170,7 @@ public class MembersController {
             RefreshVO refreshVO = membersService.getRefreshToken(m_id);
             // DB의 refreshToken과 유저가 보낸  refreshToken이 같아야 accessToken 발급
             if(refreshVO == null || ! refreshToken.equals((refreshVO.getRefresh_token()))) {
-                 return new DataVO(false,"refreshToken 불일치치", null);
+                 return new DataVO(false,"refreshToken 불일치", null);
             }
             // 새로운 accessToken, refreshToken 발급
              String newAccessToken = jwtUtil.generateAccessToken(m_id);
