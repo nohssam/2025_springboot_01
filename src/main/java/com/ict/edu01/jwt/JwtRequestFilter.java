@@ -71,7 +71,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             }
 
         }else{
-            log.info("Authorization empty Bearer token empty");
+            log.info("Authorization header is empty or doesn't start with Bearer");
         }
 
         // 사용자ID가 존재하고 SecurityContext에 인증정보가 없는 경우 등록하기 위해서서
