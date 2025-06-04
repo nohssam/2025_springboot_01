@@ -11,7 +11,12 @@
         insert into members(m_id, m_pw, m_name, m_addr, m_addr2, m_email, m_phone )
         values(#{m_id}, #{m_pw}, #{m_name}, #{m_addr}, #{m_addr2}, #{m_email}, #{m_phone})
     </insert>
-    
+
+    <insert id="getRegister2"  parameterType="MembersVO">
+        insert into members(m_id,  m_name,  sns_email_kakao, sns_provider )
+        values(#{m_id}, #{m_name}, #{sns_email_kakao}, #{sns_provider})
+    </insert>
+
     <select id="getMyPage" parameterType="String" resultType="MembersVO">
         select * from members where m_id = #{m_id}
     </select>

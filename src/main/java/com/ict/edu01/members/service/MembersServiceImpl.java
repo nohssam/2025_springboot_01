@@ -38,6 +38,12 @@ public class MembersServiceImpl implements MembersService {
         return membersMapper.getRefreshToken(m_id);
     }
 
+    @Override
+    public void getRegister2(MembersVO mvo) {
+        membersMapper.getRegister2(mvo);
+        
+    }
+
     
     
 }

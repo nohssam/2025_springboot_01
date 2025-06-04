@@ -14,4 +14,5 @@ public interface MembersMapper {
     MembersVO findUserById(String m_id) ;
     void saveRefreshToken(RefreshVO refreshVO);
     RefreshVO getRefreshToken(String m_id);
+    void getRegister2(MembersVO mvo);
 }

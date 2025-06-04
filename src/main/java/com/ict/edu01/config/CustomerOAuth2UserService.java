@@ -30,6 +30,7 @@ public class CustomerOAuth2UserService extends DefaultOAuth2UserService{
 
         if(provider.equals("kakao")){
             Map<String,Object> kakaoAccount = (Map<String,Object>)attributes.get("kakao_account");
+            
             if(kakaoAccount == null){
                 throw new OAuth2AuthenticationException("kakao error");
             }

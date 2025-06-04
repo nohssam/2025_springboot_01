@@ -11,5 +11,5 @@ public interface MembersService {
     MembersVO getMyPage(String m_id);
     void saveRefreshToken(String m_id, String refreshToken, Date expiry_date);
     RefreshVO getRefreshToken(String m_id);
-          
+    void getRegister2(MembersVO mvo);
 } 

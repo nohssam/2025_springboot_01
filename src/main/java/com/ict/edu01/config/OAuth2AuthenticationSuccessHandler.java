@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import com.ict.edu01.jwt.JwtUtil;
 import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.service.MyUserDetailService;
+import com.ict.edu01.members.vo.MembersVO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -48,7 +49,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                // CustomerOAuth2UserService 에서 저장한 정보 호출
                OAuth2User oAuth2User =  oAuth2AuthenticationToken.getPrincipal();
                String id = oAuth2User.getAttribute("id");
-               String name = oAuth2User.getAttribute("name");
+               String name = oAuth2User.getAttribute("nickname");
                String email = oAuth2User.getAttribute("email");
                String token = jwtUtil.generateAccessToken(id);
 
@@ -56,7 +57,21 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                log.info("name : " + name);
                log.info("email : " + email);
                log.info("token : " + token);
+               
                // DB에 저장
+               MembersVO existing = membersService.getMyPage(id);
+               if(existing == null){
+                 MembersVO mvo = new MembersVO();
+                 mvo.setM_id(id);
+                 mvo.setM_name(name);
+                 // 나중에 kakao와 naver 분리
+                 mvo.setSns_email_kakao(email);
+                 mvo.setSns_provider("kakao");
+
+                 membersService.getRegister2(mvo);
+                 log.info("신규 카카오 사용자 DB 에 저장장");
+                 
+               }
 
                // 쿠키에 token 저장
                Cookie cookie = new Cookie("authToken", token);
@@ -64,6 +79,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                cookie.setSecure(false);       // https에서만 사용 가능 (나중에 true)
                cookie.setPath("/");            // 전체 도메인에서 사용 가능
                response.addCookie(cookie);
+
+               // 쿠키에 token 저장
+               Cookie providerCookie = new Cookie("snsProvider", provider);
+               providerCookie.setPath("/");            // 전체 도메인에서 사용 가능
+               
+               response.addCookie(providerCookie);
                
                // 쿠키를 jwt에서 처리 하자 
                response.sendRedirect("http://localhost:3000/oauth2/redirect");    
