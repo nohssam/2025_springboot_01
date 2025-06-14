@@ -104,7 +104,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
             registry.addMapping("/**") // 모든 엔드포인트에 대한 CORS 허용
-                    .allowedOrigins("http://localhost:3000")
+                    .allowedOrigins("http://43.201.105.80")
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowCredentials(true);  // 인증정보 포함함
                 }
@@ -112,7 +112,7 @@ public class SecurityConfig {
         */
         CorsConfiguration corsConfig = new CorsConfiguration();
         // 허용할 Origin 설정, 메서드, 헤더, 인증증
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://studyjava.shop","http://43.203.201.193"));
+        corsConfig.setAllowedOrigins(Arrays.asList("http://43.201.105.80","http://studyjava.shop","http://43.203.201.193"));
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(Arrays.asList("*"));
         corsConfig.setAllowCredentials(true);

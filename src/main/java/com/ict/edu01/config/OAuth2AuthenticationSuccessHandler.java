@@ -87,12 +87,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                response.addCookie(providerCookie);
                
                // 쿠키를 jwt에서 처리 하자 
-               response.sendRedirect("http://localhost:3000/oauth2/redirect");    
+               response.sendRedirect("http://43.201.105.80/oauth2/redirect");    
 
             }
         } catch (Exception e) {
            log.info("error : " + e);
-           response.sendRedirect("http://localhost:3000/login");
+           response.sendRedirect("http://43.201.105.80/login");
         }
     }
 
